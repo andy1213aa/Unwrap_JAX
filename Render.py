@@ -5,7 +5,7 @@ from Camera import Camera
 from Ray import Ray
 from Vec3 import Vec3
 from Scene import Scene
-
+import time
 
 class Renderer:
     '''
@@ -41,11 +41,16 @@ class Renderer:
 
     def ray_trace(self, origin, normalized_direction):
         far = 1.0e15  # A large number, which we can never hit
-        distances = [
-            o.intersect(origin, normalized_direction)
-            for o in self.scene.objects
-        ]
-        print(distances)
+        # distances = [
+        #     o.ray_triangle_intersection(origin, normalized_direction)
+        #     for o in self.scene.objects
+        # ]
+
+        for i, o in enumerate(self.scene.objects):
+            for r in normalized_direction:
+                start = time.time()
+                ret = o.intersect(origin, r)
+                print(f'{i}th Extime: {time.time()-start}')
         # nearest = reduce(jnp.minimum, distances)
         color = Vec3(0, 0, 0)
         # for (o, d) in zip(self.scene.objects, distances):
@@ -63,15 +68,27 @@ class Renderer:
             self.camera.princpt[0],
             self.camera.princpt[1],
         )
-        x = jnp.tile(jnp.linspace(S[0], S[2], self.camera.width),
-                     self.camera.height)
-        y = jnp.repeat(jnp.linspace(S[1], S[3], self.camera.height),
-                       self.camera.width)
+        x = jnp.tile(
+            jnp.linspace(S[0], S[2], self.camera.width),
+            self.camera.height,
+        )
+        y = jnp.repeat(
+            jnp.linspace(S[1], S[3], self.camera.height),
+            self.camera.width,
+        )
 
+        z = jnp.repeat(jnp.array([self.camera.focal[0]]), y.shape[0])
+        
+        print('Canvas Border:')
+        print(f'X: [{jnp.min(x)}, {jnp.max(x)}]')
+        print(f'Y: [{jnp.min(y)}, {jnp.max(y)}]')
+        print(f'Z: [{jnp.min(z)}, {jnp.max(z)}]')
 
-        origin = Vec3(self.camera.origin[0], self.camera.origin[1],
-                      self.camera.origin[2])
-        ray = (Vec3(x, y, 0) - origin).norm()
-        print(ray)
-        image = self.ray_trace(origin, (Vec3(x, y, 0) - origin).norm())
+        ray = jnp.stack([x, y, z], axis=1) - self.camera.origin
+        ray /= jnp.linalg.norm(ray, axis=1)[:, jnp.newaxis]
+
+        image = self.ray_trace(
+            self.camera.origin,
+            ray,
+        )
         # return image

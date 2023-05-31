@@ -7,7 +7,7 @@ from Render import Renderer
 from pytorch3d.io import load_obj
 from Shapes import triangle
 from Scene import Scene
-
+import torch
 
 def get_KRT(camera_info_pth):
     # 定義相機參數列表
@@ -79,10 +79,13 @@ def main():
     verts = jnp.array(verts.astype(jnp.float32))
 
     verts, faces, aux = load_obj('../test_data/000220.obj')
-
-    triangle_idx = jnp.array(faces.verts_idx)
-    scene_objects = [triangle(vtxes) for vtxes in triangle_idx]
-
+    verts *= 10
+    print('Object Border:')
+    print(f'X: [{torch.min(verts[:, 0])}, {torch.max(verts[:, 0])}]')
+    print(f'Y: [{torch.min(verts[:, 1])}, {torch.max(verts[:, 1])}]')
+    print(f'Z: [{torch.min(verts[:, 2])}, {torch.max(verts[:, 2])}]')
+    scene_objects = [triangle(jnp.array(verts[vtxes])) for vtxes in faces.verts_idx]
+    
     scene = Scene(scene_objects)
     '''
     CAMERA
@@ -90,8 +93,8 @@ def main():
     camera_params = get_KRT('/home/aaron/Desktop/multiface/6674443_GHS/KRT')
     camera = Camera(
         origin=jnp.array([0., 0., 0.]),
-        width=1334,
-        height=2048,
+        width=334,
+        height=512,
         K=camera_params[view]['K'],
         R=camera_params[view]['R'],
         t=camera_params[view]['t'],
