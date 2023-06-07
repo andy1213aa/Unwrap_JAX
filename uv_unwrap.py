@@ -67,7 +67,7 @@ for loop in obj.data.loops:
     uv_coordinates.append((vertex_index, pixel_x, pixel_y))
 
 # Print the UV coordinates for each vertex
-with open('/home/steven/itri/tracked_mesh/uv.txt', 'w') as f:
+with open('uv.txt', 'w') as f:
     for vertex_index, pixel_x, pixel_y in uv_coordinates:
         print(f"{vertex_index}, {pixel_x}, {pixel_y}\n")
         f.write(f"{vertex_index}, {pixel_x}, {pixel_y}\n")
