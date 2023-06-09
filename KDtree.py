@@ -1,4 +1,5 @@
 from AABB import AABB
+import numpy as np
 
 
 class KDNode:
@@ -17,12 +18,21 @@ class KDNode:
             self.aabb = self.objects[0].aabb
 
     def split(self):
+
         sorted_objects = sorted(
             self.objects,
             key=lambda o: o.aabb.min_corner[self.split_axis],
         )
-        median_idx = len(sorted_objects) // 2
+        # print(f'sorted_min: {sorted_objects[0].aabb.min_corner}')
+        # print(f'sorted_max: {sorted_objects[-1].aabb.max_corner}')
+        # print(f'sorted_objects: {len(sorted_objects)}')
 
+        self.aabb = AABB(
+            np.min([obj.aabb.min_corner for obj in sorted_objects], axis=0),
+            np.max([obj.aabb.max_corner for obj in sorted_objects], axis=0),
+        )
+
+        median_idx = len(sorted_objects) // 2
         self.left = KDNode(
             sorted_objects[:median_idx],
             self.depth + 1,
@@ -31,32 +41,30 @@ class KDNode:
             sorted_objects[median_idx:],
             self.depth + 1,
         )
-        self.aabb = AABB(
-            self.left.aabb.min_corner,
-            self.right.aabb.max_corner,
-        )
 
 
 class KDTree:
 
-    def __init__(self, objects):
+    def __init__(self, objects, vis3D):
         self.root = KDNode(objects)
+        self.vis3D = vis3D
 
-    def intersect(self, ray_origin, ray_direction):
+    def intersect(self, ith, ray_origin, ray_direction):
         intersections = []
-        intersections_AABB = []
 
         def traverse(node):
             if node.aabb.intersect(ray_origin, ray_direction):
+                # ret = self.vis3D.draw_aabb_tracing(ith, ray_origin, node.aabb)
                 if node.left:
                     traverse(node.left)
                 if node.right:
                     traverse(node.right)
                 if not node.left and not node.right:
-                    intersections_AABB.append(node)
+
+                    
                     for obj in node.objects:
                         if obj.intersect(ray_origin, ray_direction):
                             intersections.append(obj)
 
         traverse(self.root)
-        return intersections, intersections_AABB
+        return intersections

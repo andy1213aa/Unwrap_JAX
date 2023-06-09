@@ -26,7 +26,7 @@ class Camera:
         self.t = t
         self.focal = focal
         self.princpt = princpt
-        self.normal_vector = np.array([0, 0, -1])
+        self.normal_vector = np.array([0, 0, 1])
         self.img = img
         
         # 像素的物理尺寸
@@ -48,3 +48,6 @@ class Camera:
         cx_mm = cx_pixels * self.pixel_size_mm
         cy_mm = cy_pixels * self.pixel_size_mm
         self.princpt_mm = np.array([cx_mm, cy_mm])
+
+        self.width_mm = width * self.pixel_size_mm
+        self.height_mm = height * self.pixel_size_mm
