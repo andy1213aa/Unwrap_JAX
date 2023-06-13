@@ -1,5 +1,6 @@
 from AABB import AABB
 import numpy as np
+import time
 
 
 class KDNode:
@@ -53,18 +54,22 @@ class KDTree:
         intersections = []
 
         def traverse(node):
+
             if node.aabb.intersect(ray_origin, ray_direction):
+
                 # ret = self.vis3D.draw_aabb_tracing(ith, ray_origin, node.aabb)
                 if node.left:
                     traverse(node.left)
                 if node.right:
                     traverse(node.right)
-                if not node.left and not node.right:
 
-                    
+                if not node.left and not node.right:
                     for obj in node.objects:
+
                         if obj.intersect(ray_origin, ray_direction):
+
                             intersections.append(obj)
 
         traverse(self.root)
+
         return intersections

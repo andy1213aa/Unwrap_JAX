@@ -58,7 +58,7 @@ class Renderer:
 
             ret = self.kd_tree.intersect(i, origin[i], norm_ray_dir)
             duration = time.time() - start
-
+            t += duration
             if not ret:  # No occlude
                 plane_intersect = self.get_plane_intersect(
                     origin[i],
@@ -76,8 +76,6 @@ class Renderer:
                     pixel_xy = self.xy2pixel(plane_intersect[:2])
 
                     color[i] = self.camera.img[pixel_xy[1]][pixel_xy[0]]
-
-            t += duration
 
         print(f'Total Extime: {t}s')
         print(f'No occlude: {not_occlude}')

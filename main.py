@@ -67,8 +67,7 @@ def main():
         f'/home/aaron/Desktop/multiface/{subject}_GHS/images/{facial}/{view}/{idx}.png'
     )
     cv2.imwrite('2dimage.png', img)
-    # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-   
+
     '''
     CAMERA
     '''
@@ -111,7 +110,6 @@ def main():
     ray_origin = verts
     ray_dir = camera.origin - verts
     ray_dir /= np.linalg.norm(ray_dir, axis=1)[:, np.newaxis]
-
     '''
     '''
 
@@ -130,40 +128,40 @@ def main():
                 vert2uv[idx] = (
                     aux.verts_uvs.numpy()[faces.textures_idx[i][j]] *
                     1023).astype(np.int32)
-
+    
     for i, vtx_c in enumerate(vertex_color):
         if i in vert2uv:
             uv = vert2uv[i]
-            cv2.circle(uv_texture, (uv[1], uv[0]), 5, tuple(vtx_c), -1)
-    
-    cv2.imwrite('uv_test.png', np.rot90(uv_texture, k=1))
+            uv_texture[uv[0], uv[1]] = vtx_c
+            # cv2.circle(uv_texture, (uv[1], uv[0]), 5, tuple(vtx_c), -1)
 
-    '''
-    VIS
-    '''
-    import matplotlib.pyplot as plt
-    from mpl_toolkits.mplot3d import Axes3D
+    cv2.imwrite('uv_test.png', uv_texture)
+    # '''
+    # VIS
+    # '''
+    # import matplotlib.pyplot as plt
+    # from mpl_toolkits.mplot3d import Axes3D
 
-    # 创建示例数据
-    x = verts[:, 0]
-    y = verts[:, 1]
-    z = verts[:, 2]
+    # # 创建示例数据
+    # x = verts[:, 0]
+    # y = verts[:, 1]
+    # z = verts[:, 2]
 
-    # 创建3D图形对象
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
+    # # 创建3D图形对象
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111, projection='3d')
 
-    # 绘制3D点
-    ax.scatter(x, y, z, s=[1] * 7306, c=vertex_color / 255.)
-    ax.scatter(0, 0, 0, s=[100],c='g')
+    # # 绘制3D点
+    # ax.scatter(x, y, z, s=[1] * 7306, c=vertex_color / 255.)
+    # ax.scatter(0, 0, 0, s=[100], c='g')
 
-    # 设置坐标轴标签
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    ax.set_zlabel('Z')
+    # # 设置坐标轴标签
+    # ax.set_xlabel('X')
+    # ax.set_ylabel('Y')
+    # ax.set_zlabel('Z')
 
-    # 显示图形
-    plt.show()
+    # # 显示图形
+    # plt.show()
     '''
     '''
 
