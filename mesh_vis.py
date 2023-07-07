@@ -1,15 +1,15 @@
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from pytorch3d.io import load_obj
 import numpy as np
-
-verts, faces, aux = load_obj('../test_data/013665.obj')
+import cv2
+from pytorch3d.io import load_obj
+verts, faces, aux = load_obj('../test_data/topology.obj')
 verts = verts.numpy()
 used_vtx_idx = np.unique(faces.verts_idx.numpy().flatten())
 used_verts = verts[used_vtx_idx]
-print(used_verts.shape)
-color = ['r']*7306
+print(verts.shape)
+color = ['r']*verts.shape[0]
 # 创建示例数据
 x = verts[:, 0]
 y = verts[:, 1]
@@ -22,7 +22,7 @@ fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
 # 绘制3D点
-ax.scatter(x, y, z, s=[1]*7306, c=color)
+ax.scatter(x, y, z, s=[1]*verts.shape[0], c=color)
 
 # 设置坐标轴标签
 ax.set_xlabel('X')
