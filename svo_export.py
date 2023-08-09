@@ -159,6 +159,7 @@ def main():
 
                 # Copy the right image to the right side of SBS image
                 svo_image_sbs_rgba[0:, width:, :] = right_image.get_data()
+                
 
                 # Convert SVO image from RGBA to RGB
                 ocv_image_sbs_rgb = cv2.cvtColor(svo_image_sbs_rgba, cv2.COLOR_RGBA2RGB)

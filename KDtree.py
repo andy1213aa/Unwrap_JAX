@@ -1,6 +1,7 @@
 from AABB import AABB
 import numpy as np
 import time
+from Ray import Ray
 
 
 class KDNode:
@@ -50,12 +51,12 @@ class KDTree:
         self.root = KDNode(objects)
         self.vis3D = vis3D
 
-    def intersect(self, ith, ray_origin, ray_direction):
+    def intersect(self, ith, ray, return_nearly = False):
         intersections = []
 
         def traverse(node):
 
-            if node.aabb.intersect(ray_origin, ray_direction):
+            if node.aabb.intersect(ray.origin, ray.direction):
 
                 # ret = self.vis3D.draw_aabb_tracing(ith, ray_origin, node.aabb)
                 if node.left:
@@ -66,10 +67,26 @@ class KDTree:
                 if not node.left and not node.right:
                     for obj in node.objects:
 
-                        if obj.intersect(ray_origin, ray_direction):
+                        if obj.intersect(ray.origin, ray.direction):
 
                             intersections.append(obj)
 
         traverse(self.root)
-
+        
+        if intersections and return_nearly:
+            return [self.nearly_triangle(ray, intersections)]
+            
         return intersections
+
+    def nearly_triangle(self, ray: Ray, triangles: list):
+        origin = ray.origin
+        min_distance = 1e+10
+        nearly_idx = 0
+        for i, tri in enumerate(triangles):
+            middle = tri.vertices[0] * 0.3 + tri.vertices[
+                1] * 0.4 + tri.vertices[2] * 0.3
+            dist = np.linalg.norm(middle-origin)
+            if dist < min_distance:
+                min_distance = dist
+                nearly_idx = i
+        return triangles[nearly_idx]

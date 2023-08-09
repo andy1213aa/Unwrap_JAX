@@ -1,5 +1,21 @@
 import numpy as np
 from Ray import Ray
+from functools import wraps
+import time
+
+
+def measureExcutionTime(func):
+
+    @wraps(func)
+    def _time_it(*args, **kwargs):
+        start = time.time()
+        try:
+            return func(*args, **kwargs)
+        finally:
+            end_ = time.time() - start
+            print(f"{func.__name__} execution time: {end_: 0.4f} sec.")
+
+    return _time_it
 
 
 def create_rays(pts1, pts2, normalize=True):

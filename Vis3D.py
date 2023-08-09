@@ -3,6 +3,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 from itertools import combinations
 
+
 class Vis_tracing_3D():
 
     def __init__(self, verts, used_vtx_idx):
@@ -15,7 +16,7 @@ class Vis_tracing_3D():
         fig = plt.figure(figsize=(50, 20))
         self.ax = fig.add_subplot(111, projection='3d')
         self.ax.view_init(elev=-38., azim=-89)
-        
+
         color = ['black'] * 7306
         size = [1] * 7306
         color[ith] = 'r'
@@ -63,7 +64,7 @@ class Vis_tracing_3D():
         combination = np.array(list(combinations(arr, 2)))
 
         for edge in combination:
-        
+
             vertex1 = corners[edge[0]]
             vertex2 = corners[edge[1]]
 

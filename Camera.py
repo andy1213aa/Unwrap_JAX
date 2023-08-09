@@ -75,7 +75,7 @@ class Camera:
     def pixel2xy(self, pixel_xy):
         
         # convert pixel to coordinate in mm
-        plane_xy = np.zeros(pixel_xy.shape)
+        plane_xy = np.zeros((2,))
 
         plane_xy[0] = pixel_xy[0] * self.pixel_size_mm
         plane_xy[1] = pixel_xy[1] * self.pixel_size_mm

@@ -4,8 +4,8 @@ import numpy as np
 mini = 1e+6
 class Triangle():
     # Möller–Trumbore ray-triangle intersection algorithm
-    def __init__(self, vertices):
-        
+    def __init__(self, idx, vertices):
+        self.idx = idx
         self.vertices = vertices
         self.aabb = AABB(np.min(vertices, axis=0), np.max(vertices, axis=0))
         # print('-----------------')
