@@ -57,8 +57,8 @@ class KDTree:
         def traverse(node):
 
             if node.aabb.intersect(ray.origin, ray.direction):
-
-                # ret = self.vis3D.draw_aabb_tracing(ith, ray_origin, node.aabb)
+      
+                # ret = self.vis3D.draw_aabb_tracing(ith, ray.origin, node.aabb)
                 if node.left:
                     traverse(node.left)
                 if node.right:
@@ -66,9 +66,7 @@ class KDTree:
 
                 if not node.left and not node.right:
                     for obj in node.objects:
-
                         if obj.intersect(ray.origin, ray.direction):
-
                             intersections.append(obj)
 
         traverse(self.root)

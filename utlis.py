@@ -38,6 +38,22 @@ def create_rays(pts1, pts2, normalize=True):
     return Rays
 
 
+def export_r3ds_format(intersects: list):
+
+    output = []
+
+    for i, shape in enumerate(intersects):
+        output.append([shape.idx, 0.3, 0.4])
+
+    with open('output.txt', 'w') as file:
+        file.write('[')
+        for index, shape in enumerate(output):
+            file.write(str(shape))
+            if index < len(output) - 1:
+                file.write(',')
+        file.write(']')
+
+
 class FaceMesh():
 
     def __init__(self, batch_size=1, kpt_num=478):
@@ -112,20 +128,27 @@ class FaceMesh():
         self.mouth_idx = (self.lipsUpperOuter + self.lipsLowerOuter +
                           self.lipsUpperInner + self.lipsLowerInner)
 
-        self.eyes_idx = (self.rightEyeUpper0 + self.rightEyeLower0 +
-                         self.rightEyebrowUpper + self.rightEyebrowLower +
-                         self.leftEyeUpper0 + self.leftEyeLower0 +
-                         self.leftEyebrowUpper + self.leftEyebrowLower +
-                         self.rightEyeIris + self.leftEyeIris)
+        self.eyes_idx = (
+                        self.rightEyeUpper0 
+                         + self.rightEyeLower0 
+                         + self.rightEyebrowUpper 
+                         + self.rightEyebrowLower 
+                         + self.rightEyeIris 
+                        #  + self.leftEyeUpper0 
+                        #  + self.leftEyeLower0 
+                        #  + self.leftEyebrowUpper 
+                        #  + self.leftEyebrowLower 
+                        #  + self.leftEyeIris
+                         )
 
         self.nose_idx = (self.noseTip + self.noseBottom +
                          self.noseRightCorner + self.noseLeftCorner)
 
         self.features_idx = (
-            self.silhouette,
+            # self.silhouette,
             self.mouth_idx,
             self.eyes_idx,
-            self.nose_idx,
+            # self.nose_idx,
         )
 
     def detect(

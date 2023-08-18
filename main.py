@@ -60,35 +60,43 @@ def get_KRT(camera_info_pth):
 def main():
 
     subject = '6674443'
-    facial = 'E001_Neutral_Eyes_Open'
-    view = '400002'
-    idx = '000220'
+    facial = 'E041_Mouth_Nose_Right'
+    view = '400023'
+    idx = '019278'
     texturesize = (1024, 1024, 3)
     render_type = 'feature_marking'  #'feature_marking'  #render_texel
+    # img2D_pth = f'/home/aaron/Desktop/multiface/{subject}_GHS/images/{facial}/{view}/{idx}.png'
     # obj_pth = f'/home/aaron/Desktop/multiface/{subject}_GHS/geom/tracked_mesh/{facial}/{idx}.obj'
-    img2D_pth = f'/home/aaron/Desktop/multiface/{subject}_GHS/images/{facial}/{view}/{idx}.png'
-    obj_pth = 'MeshroomCache/Texturing/93c9631dda87041b9fef6beebf2734ecc11d0240/texturedMesh.obj'
-    # img2D_pth = '/home/aaron/Downloads/me/test/frame_0001.png'
+
+    img2D_pth = '/home/aaron/Downloads/me/frame/frame_0001.png'
+    obj_pth = '/media/aaron/work/ITRI_SSTC/S100/FY112_FRP/code/FRP/test_data/Me_KRTFREE_2021/MeshroomCache/Texturing/4d930905e089fe0229bed196a80972c531584f65/texturedMesh.obj'
+    
     krt_pth = '/home/aaron/Desktop/multiface/6674443_GHS/KRT'
     '''
     Get R t from Meshroom
     '''
+
     R_o = [
-        "0.95157216271871836", "0.16986488511456146", "-0.256234931154669",
-        "-0.16874388799072634", "0.98530298599920207", "0.026524065428010543",
-        "0.25697455011069548", "0.017998516218650118", "0.96625055446780095"
+                        "0.9696113406631468",
+                        "-0.081495470728175146",
+                        "0.23067799268289182",
+                        "0.15824885970061553",
+                        "0.92799327744009152",
+                        "-0.33732147193656709",
+                        "-0.18657745432090675",
+                        "0.36357525393897544",
+                        "0.91268937117857329"
     ]
 
     C_o = [
-        "0.48676346278241278", "-0.022171128484136042", "0.08938904329579897"
+                        "-0.2276379113334705",
+                        "0.26943315530866485",
+                        "0.57614961857759006"
     ]
 
-    R = np.array([float(i) for i in R_o]).reshape(3, 3)
+    R = np.array([float(i) for i in R_o]).reshape((3, 3), order='F')
     C = np.array([float(i) for i in C_o]).reshape(3, 1)
     t = (-1 * R @ C).reshape(3, )
-
-    print(f'R: {R}')
-    print(f't: {t}')
     '''
     2D IMAGE
     '''
@@ -100,17 +108,21 @@ def main():
     camera_params = get_KRT(krt_pth)
     camera = Camera(
         origin=np.array([0., 0., 0.]),
-        width=1334,
-        height=2048,
+        width=1080,
+        height=1920,
         K=camera_params[view]['K'],
         # R=camera_params[view]['R'],
         # t=camera_params[view]['t'],
         R=R,
         t=t,
-        focal=camera_params[view]['focal'],
-        princpt=camera_params[view]['princpt'],
+        # focal=camera_params[view]['focal'],  #in pixel
+        focal=np.array([1475.7773488589125] * 2),
+        # princpt=camera_params[view]['princpt'],  #in pixel
+        princpt=np.array([528.67604740174522, 963.96349056605777]),
         img=img,
-        pixel_size_mm=0.00345)
+        pixel_size_mm=0.5625,
+        # pixel_size_mm=0.00345,
+    )
     '''
     OBJ
     '''
@@ -118,9 +130,21 @@ def main():
     verts, faces, aux = load_obj(obj_pth)
     verts = verts.numpy()
     verts = (camera.R @ verts.T).T + camera.t
+    # verts = (camera.R @ verts.T).T - camera.t
 
-    verts[:, 2] *= -1
+    # verts[:, 1] *= -1
+    # verts[:, 2] *= -1
+    # verts[:, 2] -= 3
+
+    # verts *= 500
+    print('VERTS:')
     print(verts)
+    print('ROTATION:')
+    print(camera.R)
+    print('TRANSLATION:')
+    print(camera.t)
+    print('focal mm:')
+    print(camera.focal_mm)
     scene_objects = [
         Triangle(i, verts[vtidx]) for i, vtidx in enumerate(faces.verts_idx)
     ]
@@ -138,14 +162,16 @@ def main():
     '''
     if render_type == 'feature_marking':
 
+        # feature detection
         faceDetection = utlis.FaceMesh()
         feature = faceDetection.detect(np.expand_dims(img, 0))[0]
+
+        # pts1
         pts1 = np.zeros((feature.shape[0], 3), dtype=np.float32)
 
+        # pts2
         feature_mm = np.apply_along_axis(camera.pixel2xy, axis=1, arr=feature)
-
         focal_mm_col = np.full((feature.shape[0], 1), camera.focal_mm[0])
-
         pts2 = np.append(feature_mm, focal_mm_col, axis=1)
 
     elif render_type == 'render_texel':
@@ -153,9 +179,10 @@ def main():
         pts2 = camera.origin
 
     Rays = utlis.create_rays(pts1=pts1, pts2=pts2)
-
+    print(list(map(lambda ray: ray.direction, Rays[:5])))
     renderer = Renderer(camera, kd_tree, Rays)
     res = renderer.feature_marking()
+    utlis.export_r3ds_format(res)
     # vertex_color = renderer.render_texel()
     # '''
     # Draw
@@ -183,9 +210,15 @@ def main():
     '''
 
     # # 创建示例数据
+
+    clip_num = 50
+
     x = verts[:, 0]
+    x_clip = [x[i] for i in range(0, len(x), clip_num)]
     y = verts[:, 1]
+    y_clip = [y[i] for i in range(0, len(y), clip_num)]
     z = verts[:, 2]
+    z_clip = [z[i] for i in range(0, len(z), clip_num)]
 
     # 创建3D图形对象
     fig = plt.figure()
@@ -198,8 +231,12 @@ def main():
     # # 绘制3D点
     # ax.scatter(x, y, z, s=[1] * 7306, c=vertex_color / 255.)
 
-    # ax.scatter(x, y, z, s=[1] * verts.shape[0], c=[(0, 0, 0)] * verts.shape[0])
-    # ax.scatter(0, 0, 0, s=[100], c='g')
+    ax.scatter(x_clip,
+               y_clip,
+               z_clip,
+               s=[1] * len(x_clip),
+               c=[(0, 0, 0)] * len(x_clip))
+    ax.scatter(0, 0, 0, s=[100], c='g')
 
     # 设置坐标轴标签
     ax.set_xlabel('X')

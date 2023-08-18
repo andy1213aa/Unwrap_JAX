@@ -4,7 +4,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import cv2
 from pytorch3d.io import load_obj
-verts, faces, aux = load_obj('/home/aaron/Desktop/multiface_version/MeshroomCache/Texturing/2d439a7dd5dfcd5e43d9eaf6cfec957c7d1213de/texturedMesh.obj')
+verts, faces, aux = load_obj('MeshroomCache/Texturing/765aeed556c961561548c55866209afae8f59477/texturedMesh.obj')
 
 verts = verts.numpy()
 used_vtx_idx = np.unique(faces.verts_idx.numpy().flatten())
@@ -13,8 +13,8 @@ print(verts.shape)
 color = ['r']*verts.shape[0]
 # 创建示例数据
 x = verts[:, 0]
-y = verts[:, 1]
-z = verts[:, 2]
+y = verts[:, 1] * -1
+z = verts[:, 2] * -1
 
 for i in used_vtx_idx:
     color[i] = 'b'

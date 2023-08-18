@@ -17,8 +17,8 @@ class Vis_tracing_3D():
         self.ax = fig.add_subplot(111, projection='3d')
         self.ax.view_init(elev=-38., azim=-89)
 
-        color = ['black'] * 7306
-        size = [1] * 7306
+        color = ['black'] * 153555
+        size = [1] * 153555
         color[ith] = 'r'
         size[ith] = 50
         # 创建示例数据
