@@ -70,29 +70,19 @@ def main():
 
     img2D_pth = '/home/aaron/Downloads/me/frame/frame_0001.png'
     obj_pth = '/media/aaron/work/ITRI_SSTC/S100/FY112_FRP/code/FRP/test_data/Me_KRTFREE_2021/MeshroomCache/Texturing/4d930905e089fe0229bed196a80972c531584f65/texturedMesh.obj'
-    
+
     krt_pth = '/home/aaron/Desktop/multiface/6674443_GHS/KRT'
     '''
     Get R t from Meshroom
     '''
 
     R_o = [
-                        "0.9696113406631468",
-                        "-0.081495470728175146",
-                        "0.23067799268289182",
-                        "0.15824885970061553",
-                        "0.92799327744009152",
-                        "-0.33732147193656709",
-                        "-0.18657745432090675",
-                        "0.36357525393897544",
-                        "0.91268937117857329"
+        "0.9696113406631468", "-0.081495470728175146", "0.23067799268289182",
+        "0.15824885970061553", "0.92799327744009152", "-0.33732147193656709",
+        "-0.18657745432090675", "0.36357525393897544", "0.91268937117857329"
     ]
 
-    C_o = [
-                        "-0.2276379113334705",
-                        "0.26943315530866485",
-                        "0.57614961857759006"
-    ]
+    C_o = ["-0.2276379113334705", "0.26943315530866485", "0.57614961857759006"]
 
     R = np.array([float(i) for i in R_o]).reshape((3, 3), order='F')
     C = np.array([float(i) for i in C_o]).reshape(3, 1)
@@ -130,21 +120,7 @@ def main():
     verts, faces, aux = load_obj(obj_pth)
     verts = verts.numpy()
     verts = (camera.R @ verts.T).T + camera.t
-    # verts = (camera.R @ verts.T).T - camera.t
 
-    # verts[:, 1] *= -1
-    # verts[:, 2] *= -1
-    # verts[:, 2] -= 3
-
-    # verts *= 500
-    print('VERTS:')
-    print(verts)
-    print('ROTATION:')
-    print(camera.R)
-    print('TRANSLATION:')
-    print(camera.t)
-    print('focal mm:')
-    print(camera.focal_mm)
     scene_objects = [
         Triangle(i, verts[vtidx]) for i, vtidx in enumerate(faces.verts_idx)
     ]

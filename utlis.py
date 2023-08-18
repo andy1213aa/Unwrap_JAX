@@ -100,7 +100,7 @@ class FaceMesh():
         self.rightEyebrowUpper = [156, 70, 63, 105, 66, 107, 55, 193]
         self.rightEyebrowLower = [35, 124, 46, 53, 52, 65]
 
-        self.rightEyeIris = [473, 474, 475, 476, 477]
+        self.leftEyeIris = [473, 474, 475, 476, 477]
 
         self.leftEyeUpper0 = [466, 388, 387, 386, 385, 384, 398]
         self.leftEyeLower0 = [263, 249, 390, 373, 374, 380, 381, 382, 362]
@@ -113,7 +113,7 @@ class FaceMesh():
         self.leftEyebrowUpper = [383, 300, 293, 334, 296, 336, 285, 417]
         self.leftEyebrowLower = [265, 353, 276, 283, 282, 295]
 
-        self.leftEyeIris = [468, 469, 470, 471, 472]
+        self.rightEyeIris = [468, 469, 470, 471, 472]
 
         self.midwayBetweenEyes = [168]
 
@@ -133,22 +133,20 @@ class FaceMesh():
                          + self.rightEyeLower0 
                          + self.rightEyebrowUpper 
                          + self.rightEyebrowLower 
-                         + self.rightEyeIris 
-                        #  + self.leftEyeUpper0 
-                        #  + self.leftEyeLower0 
-                        #  + self.leftEyebrowUpper 
-                        #  + self.leftEyebrowLower 
-                        #  + self.leftEyeIris
+                         + self.leftEyeUpper0 
+                         + self.leftEyeLower0 
+                         + self.leftEyebrowUpper 
+                         + self.leftEyebrowLower 
                          )
 
         self.nose_idx = (self.noseTip + self.noseBottom +
                          self.noseRightCorner + self.noseLeftCorner)
 
         self.features_idx = (
-            # self.silhouette,
             self.mouth_idx,
             self.eyes_idx,
-            # self.nose_idx,
+            self.nose_idx,
+            # self.silhouette,
         )
 
     def detect(
@@ -180,12 +178,11 @@ class FaceMesh():
                 # self.error_idx =self.error_idx % 10 + 1
                 continue
 
-            annotated_image = img.copy()
             for face_landmarks in results.multi_face_landmarks:
 
                 for idx, data_point in enumerate(face_landmarks.landmark):
-                    tmp_kpt[idx, 0] = data_point.x * annotated_image.shape[1]
-                    tmp_kpt[idx, 1] = data_point.y * annotated_image.shape[0]
+                    tmp_kpt[idx, 0] = data_point.x * img.shape[1]
+                    tmp_kpt[idx, 1] = data_point.y * img.shape[0]
 
             start = 0
             for _, feat in enumerate(self.features_idx):
